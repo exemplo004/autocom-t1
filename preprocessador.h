@@ -1,3 +1,4 @@
 #ifndef PREPROCESSADOR_H
-// TODO
+void Preprocessar(char * entrada, char * saida);
+void RemoverTabEspacos(char * referencia);
 #endif

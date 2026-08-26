@@ -12,9 +12,33 @@ void RemoverLinhasVazias(FILE * fp)
     // TODO
 }
 
-void RemoverTabEspacos(FILE * fp)
+void RemoverTabEspacos(char * fn)
 {
-    // TODO
+    FILE * ref = fopen(fn, "r");
+    FILE * buf = fopen("buffer", "w");
+
+    char prev = 'n'; // Só pra inicializar como alguma coisa
+    char cur = getc(ref);
+    int i = 0;
+
+    while (cur != EOF)
+    {
+        // TODO: impedir esse processo quando dentro de uma string (dentro das aspas da .asciiz) [dá pra usar fseek()]
+        if (prev != ' ' && prev != '\n' || cur != ' ') // A'C'+B'
+                                                       // MAPA DE KARNAUGH PRA QUEM LEMBRA KAKAKAKA
+        {
+            putc(cur, buf);
+        }
+
+        prev = cur;
+        cur = getc(ref); i++;
+    }
+
+    // Removendo a referência antiga e substituindo por uma nova
+    // TODO: transformar essa parte em uma função, já que teremos que usar no fim de todo processo
+    fclose(ref); fclose(buf);
+    remove("ref");
+    rename("buffer", "ref");
 }
 
 void RemoverQuebraDeLinha(FILE * fp)
@@ -22,13 +46,15 @@ void RemoverQuebraDeLinha(FILE * fp)
     // TODO
 }
 
-void Preprocessar(FILE * inp, FILE * outp)
+void Preprocessar(char * inp, char * saida)
 {
-    printf("Bora trabalhar!!\n"); // TODO
-    // RemoverComentarios(fp);
-    // RemoverLinhasVazias(fp);
-    // RemoverTabEspacos(fp);
-    // RemoverQuebraDeLinha(fp);
+    char cmd[256];
+    sprintf(cmd, "cp %s ref", inp); // Só funciona no Linux! Acho que o Windows tem sua própria versão ~kristhian
+    system(cmd);
+    // RemoverComentarios(outp);
+    // RemoverLinhasVazias(outp);
+    RemoverTabEspacos("ref");
+    // RemoverQuebraDeLinha(outp);
 }
 
 // ---- daqui pra frente, acho que essas funções seriam úteis para os trabalhos seguintes, na conclusão efetiva do compilador

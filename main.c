@@ -14,22 +14,21 @@ int main (int argc, char ** argv)
     }
 
     // Arquivos de entrada e saída
-    FILE * in = fopen(argv[1], "r");
-    FILE * out = NULL;
+    char * in = argv[1];
+    char * out = NULL;
 
     // Checando se o nome de arquivo no parâmetro 1 existe
-    if (!in) {
+    if (!fopen(in, "r"))
+    {
         printf("%s naum eh um arquivo vahlido ou sua localizassaum estah incorreta.\n", argv[1]);
         return 1;
     }
     else // Carrega arquivo de saída de acordo com a entrada do usuário
     {
-        char * saida = argc == 3 ? argv[2] : "saida.txt";
-        FILE * out = fopen(saida, "w");
+        out = argc == 3 ? argv[2] : "saida.txt";
     }
 
     Preprocessar(in, out);
 
-    fclose(in);fclose(out);
     return 0;
 }
