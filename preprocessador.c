@@ -2,6 +2,38 @@
 #include <stdlib.h>
 #include "preprocessador.h"
 
+void FecharESubstituir(FILE * old, FILE * new)
+{
+    fclose(old); fclose(new);
+    remove(ARQUIVO_REFERENCIA);
+    rename(ARQUIVO_TEMPORARIO, ARQUIVO_REFERENCIA);
+}
+
+// Troca os '\r' do Windows por '\n'
+void RemoverPutariaDoWindows(char * fn)
+{
+    FILE * ref = fopen(fn, "r");
+    FILE * buf = fopen(ARQUIVO_TEMPORARIO, "w");
+
+    if (ref == NULL || buf == NULL) {
+        perror("Erro ao abrir arquivo");
+        return;
+    }
+
+    int cur = getc(ref);
+
+    // Loop até o fim do arquivo de referência
+    while (cur != EOF)
+    {
+        if (cur == '\r') { putc('\n', buf); }
+        else { putc(cur, buf); }
+
+        cur = getc(ref);
+    }
+
+    FecharESubstituir(ref, buf);
+}
+
 void RemoverComentarios(FILE * fp)
 {
     // TODO
@@ -74,6 +106,7 @@ void Preprocessar(char * inp, char * saida)
     char cmd[256];
     sprintf(cmd, "cp %s ref", inp); // Só funciona no Linux! Acho que o Windows tem sua própria versão ~kristhian
     system(cmd);
+    RemoverPutariaDoWindows(ARQUIVO_REFERENCIA);
     // RemoverComentarios(outp);
     RemoverLinhasVazias(ARQUIVO_REFERENCIA);
     RemoverTabEspacos(ARQUIVO_REFERENCIA);
