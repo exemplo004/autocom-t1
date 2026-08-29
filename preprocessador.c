@@ -7,9 +7,31 @@ void RemoverComentarios(FILE * fp)
     // TODO
 }
 
-void RemoverLinhasVazias(FILE * fp)
+void RemoverLinhasVazias(char * fn)
 {
-    // TODO
+    FILE * ref = fopen(fn, "r");
+    FILE * buf = fopen(ARQUIVO_TEMPORARIO, "w");
+    
+    if (ref == NULL || buf == NULL) {
+        perror("Erro ao abrir arquivo");
+        return;
+    }
+    
+    int prev = '\n';
+    int cur = getc(ref);
+    int i = 0;
+
+    // Loop até o fim do arquivo de referência
+    while (cur != EOF)
+    {
+        // Evita escrever quando percebe dois '\n' seguidos
+        if (prev != '\n' || cur != '\n') { putc(cur, buf); }
+
+        prev = cur;
+        cur = getc(ref); i++;
+    }
+
+    FecharESubstituir(ref, buf);
 }
 
 void RemoverTabEspacos(char * fn)
@@ -17,10 +39,11 @@ void RemoverTabEspacos(char * fn)
     FILE * ref = fopen(fn, "r");
     FILE * buf = fopen("buffer", "w");
 
-    char prev = 'n'; // Só pra inicializar como alguma coisa
+    char prev = '\n';
     char cur = getc(ref);
     int i = 0;
 
+    // Loop até o fim do arquivo de referência
     while (cur != EOF)
     {
         // TODO: impedir esse processo quando dentro de uma string (dentro das aspas da .asciiz) [dá pra usar fseek()]
@@ -52,8 +75,8 @@ void Preprocessar(char * inp, char * saida)
     sprintf(cmd, "cp %s ref", inp); // Só funciona no Linux! Acho que o Windows tem sua própria versão ~kristhian
     system(cmd);
     // RemoverComentarios(outp);
-    // RemoverLinhasVazias(outp);
-    RemoverTabEspacos("ref");
+    RemoverLinhasVazias(ARQUIVO_REFERENCIA);
+    RemoverTabEspacos(ARQUIVO_REFERENCIA);
     // RemoverQuebraDeLinha(outp);
 }
 
