@@ -25,8 +25,10 @@ void RemoverPutariaDoWindows(char * fn)
     // Loop até o fim do arquivo de referência
     while (cur != EOF)
     {
-        if (cur == '\r') { putc('\n', buf); }
-        else { putc(cur, buf); }
+        // Se for o '\r' do windows ignora. O '\n' que vem depois já é serve pra quebrar a linha
+        if (cur != '\r') { 
+            putc(cur, buf); 
+        }
 
         cur = getc(ref);
     }
@@ -111,6 +113,11 @@ void Preprocessar(char * inp, char * saida)
     RemoverLinhasVazias(ARQUIVO_REFERENCIA);
     RemoverTabEspacos(ARQUIVO_REFERENCIA);
     // RemoverQuebraDeLinha(outp);
+
+    // copia o arquivo temporário 'ref' para o nome final que o usuário pediu
+    sprintf(cmd, "copy ref %s", saida);
+    system(cmd);
+    remove("ref");
 }
 
 // ---- daqui pra frente, acho que essas funções seriam úteis para os trabalhos seguintes, na conclusão efetiva do compilador
