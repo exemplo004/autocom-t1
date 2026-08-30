@@ -104,7 +104,7 @@ void RemoverQuebraDeLinha(FILE * fp)
 void Preprocessar(char * inp, char * saida)
 {
     char cmd[256];
-    sprintf(cmd, "cp %s ref", inp); // Só funciona no Linux! Acho que o Windows tem sua própria versão ~kristhian
+    sprintf(cmd, "copy %s ref", inp); // Alterado para 'copy' pra funcionar no Windows
     system(cmd);
     RemoverPutariaDoWindows(ARQUIVO_REFERENCIA);
     // RemoverComentarios(outp);
