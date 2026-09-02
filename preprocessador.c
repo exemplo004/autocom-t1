@@ -91,11 +91,7 @@ void RemoverTabEspacos(char * fn)
         cur = getc(ref); i++;
     }
 
-    // Removendo a referência antiga e substituindo por uma nova
-    // TODO: transformar essa parte em uma função, já que teremos que usar no fim de todo processo
-    fclose(ref); fclose(buf);
-    remove("ref");
-    rename("buffer", "ref");
+    FecharESubstituir(ref, buf);
 }
 
 void RemoverQuebraDeLinha(FILE * fp)
