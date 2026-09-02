@@ -36,9 +36,44 @@ void RemoverPutariaDoWindows(char * fn)
     FecharESubstituir(ref, buf);
 }
 
-void RemoverComentarios(FILE * fp)
+void RemoverComentarios(char * fn)
 {
-    // TODO
+    FILE * ref = fopen(fn, "r");
+    FILE * buf = fopen(ARQUIVO_TEMPORARIO, "w");
+
+    if (ref == NULL || buf == NULL) return;
+
+    int cur = getc(ref);
+    int dentro_de_string = 0;
+    int dentro_de_comentario = 0;
+
+    while (cur != EOF)
+    {
+        // liga ou desliga flag se achar aspas duplas
+        if (cur == '"' && dentro_de_comentario == 0) {
+            dentro_de_string = !dentro_de_string;
+        }
+
+        // se for # e não tiver na string, começou um comentario
+        if (cur == '#' && dentro_de_string == 0) {
+            dentro_de_comentario = 1;
+        }
+
+        if (dentro_de_comentario == 1) {
+            // se a linha acabar, reseta o comentario
+            if (cur == '\n') {
+                dentro_de_comentario = 0;
+                putc(cur, buf); // salva o enter pra não ficar tudo em uma linha só
+            }
+        } else {
+            // salva a letra normal
+            putc(cur, buf);
+        }
+
+        cur = getc(ref);
+    }
+
+    FecharESubstituir(ref, buf);
 }
 
 void RemoverLinhasVazias(char * fn)
@@ -105,7 +140,7 @@ void Preprocessar(char * inp, char * saida)
     sprintf(cmd, "copy %s ref", inp); // Alterado para 'copy' pra funcionar no Windows
     system(cmd);
     RemoverPutariaDoWindows(ARQUIVO_REFERENCIA);
-    // RemoverComentarios(outp);
+    RemoverComentarios(ARQUIVO_REFERENCIA);
     RemoverLinhasVazias(ARQUIVO_REFERENCIA);
     RemoverTabEspacos(ARQUIVO_REFERENCIA);
     // RemoverQuebraDeLinha(outp);
