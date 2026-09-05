@@ -23,7 +23,7 @@ void caminhar(char * s, char novo)
 }
 
 // Troca os '\r' do Windows por '\n'
-void RemoverPutariaDoWindows(char * fn)
+void normalizarQuebraDeLinha(char * fn)
 {
     FILE * ref = fopen(fn, "r");
     FILE * buf = fopen(ARQUIVO_TEMPORARIO, "w");
