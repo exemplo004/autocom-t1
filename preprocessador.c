@@ -1,12 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "preprocessador.h"
+#include <string.h>
 
 void FecharESubstituir(FILE * old, FILE * new)
 {
     fclose(old); fclose(new);
     remove(ARQUIVO_REFERENCIA);
     rename(ARQUIVO_TEMPORARIO, ARQUIVO_REFERENCIA);
+}
+
+// Caminha todos os caracteres de uma string para a esquerda, adicionando um novo caractere ao final da string, antes do '\n'
+// Será utilizada para verificar se o cursor está dentro de uma string
+void caminhar(char * s, char novo)
+{
+    for (int i = 0; i < strlen(s) - 1; i++)
+    {
+        s[i] = s[i + 1];
+    }
+
+    s[strlen(s) -1] = novo;
 }
 
 // Troca os '\r' do Windows por '\n'
@@ -108,22 +121,38 @@ void RemoverTabEspacos(char * fn)
     FILE * ref = fopen(fn, "r");
     FILE * buf = fopen("buffer", "w");
 
-    char prev = '\n';
+    // Os últimos 9 caracteres do arquivo de referência serão analisados para definir se estamos numa string ou não
+    char last9[10] = "123456789";
+    char prev = last9[7];
     char cur = getc(ref);
     int i = 0;
+
+    // Bool para ferificar se o cursor se encontra dentro de uma string ou não
+    int inString = 0;
 
     // Loop até o fim do arquivo de referência
     while (cur != EOF)
     {
-        // TODO: impedir esse processo quando dentro de uma string (dentro das aspas da .asciiz) [dá pra usar fseek()]
-        if (prev != ' ' && prev != '\n' || cur != ' ') // A'C'+B'
-                                                       // MAPA DE KARNAUGH PRA QUEM LEMBRA KAKAKAKA
+        // Caminha os últimos 9 caracteres e verifica se são ".asciiz \""
+        caminhar(last9, cur);
+        if (!strcmp(last9, ".asciiz \"")) inString = 1;
+        
+        // Somente discrimina espaços e tabs se não estiver dentro de string
+        if (!inString)
+        {
+            if (prev != ' ' && prev != '\n' || cur != ' ') // A'C'+B' MAPA DE KARNAUGH PRA QUEM LEMBRA KAKAKAKA
         {
             putc(cur, buf);
         }
+        }
+        // Como está em uma string, sobrescreve sem discriminação
+        else { putc(cur, buf); }
 
         prev = cur;
         cur = getc(ref); i++;
+
+        // No caso de estar dentro de uma string, verifica se o próximo caractere é um '"', fechando saindo assim de dentro da string
+        if (inString) { inString = (cur == '"')? 0 : 1; }
     }
 
     FecharESubstituir(ref, buf);
@@ -139,7 +168,7 @@ void Preprocessar(char * inp, char * saida)
     char cmd[256];
     sprintf(cmd, "copy %s ref", inp); // Alterado para 'copy' pra funcionar no Windows
     system(cmd);
-    RemoverPutariaDoWindows(ARQUIVO_REFERENCIA);
+    normalizarQuebraDeLinha(ARQUIVO_REFERENCIA);
     RemoverComentarios(ARQUIVO_REFERENCIA);
     RemoverLinhasVazias(ARQUIVO_REFERENCIA);
     RemoverTabEspacos(ARQUIVO_REFERENCIA);
