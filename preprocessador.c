@@ -129,24 +129,18 @@ void RemoverTabEspacos(char * fn)
     FecharESubstituir(ref, buf);
 }
 
-void RemoverQuebraDeLinha(FILE * fp)
-{
-    // TODO
-}
-
 void Preprocessar(char * inp, char * saida)
 {
     char cmd[256];
-    sprintf(cmd, "copy %s ref", inp); // Alterado para 'copy' pra funcionar no Windows
+    sprintf(cmd, "cp %s ref", inp); // Alterado para 'copy' pra funcionar no Windows
     system(cmd);
     RemoverPutariaDoWindows(ARQUIVO_REFERENCIA);
     RemoverComentarios(ARQUIVO_REFERENCIA);
     RemoverLinhasVazias(ARQUIVO_REFERENCIA);
     RemoverTabEspacos(ARQUIVO_REFERENCIA);
-    // RemoverQuebraDeLinha(outp);
 
     // copia o arquivo temporário 'ref' para o nome final que o usuário pediu
-    sprintf(cmd, "copy ref %s", saida);
+    sprintf(cmd, "cp ref %s", saida);
     system(cmd);
     remove("ref");
 }
