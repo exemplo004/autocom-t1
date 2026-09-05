@@ -141,13 +141,13 @@ void RemoverTabEspacos(char * fn)
         if (!inString)
         {
             if (prev != ' ' && prev != '\n' || cur != ' ') // A'C'+B' MAPA DE KARNAUGH PRA QUEM LEMBRA KAKAKAKA
-        {
-            putc(cur, buf);
-        }
+            {
+                putc(cur, buf);
+            }
         }
         // Como está em uma string, sobrescreve sem discriminação
         else { putc(cur, buf); }
-
+        
         prev = cur;
         cur = getc(ref); i++;
 
@@ -156,11 +156,6 @@ void RemoverTabEspacos(char * fn)
     }
 
     FecharESubstituir(ref, buf);
-}
-
-void RemoverQuebraDeLinha(FILE * fp)
-{
-    // TODO
 }
 
 void Preprocessar(char * inp, char * saida)
@@ -172,7 +167,6 @@ void Preprocessar(char * inp, char * saida)
     RemoverComentarios(ARQUIVO_REFERENCIA);
     RemoverLinhasVazias(ARQUIVO_REFERENCIA);
     RemoverTabEspacos(ARQUIVO_REFERENCIA);
-    // RemoverQuebraDeLinha(outp);
 
     // copia o arquivo temporário 'ref' para o nome final que o usuário pediu
     sprintf(cmd, "copy ref %s", saida);
