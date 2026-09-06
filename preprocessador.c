@@ -10,17 +10,7 @@ void FecharESubstituir(FILE * old, FILE * new)
     rename(ARQUIVO_TEMPORARIO, ARQUIVO_REFERENCIA);
 }
 
-// Caminha todos os caracteres de uma string para a esquerda, adicionando um novo caractere ao final da string, antes do '\n'
-// Será utilizada para verificar se o cursor está dentro de uma string
-void caminhar(char * s, char novo)
-{
-    for (int i = 0; i < strlen(s) - 1; i++)
-    {
-        s[i] = s[i + 1];
-    }
 
-    s[strlen(s) -1] = novo;
-}
 
 // Troca os '\r' do Windows por '\n'
 void normalizarQuebraDeLinha(char * fn)
@@ -121,23 +111,19 @@ void RemoverTabEspacos(char * fn)
     FILE * ref = fopen(fn, "r");
     FILE * buf = fopen("buffer", "w");
 
-    // Os últimos 9 caracteres do arquivo de referência serão analisados para definir se estamos numa string ou não
-    char last9[10] = "123456789";
-    char prev = last9[7];
+    char prev = '\n';
     char cur = getc(ref);
-    int i = 0;
-
-    // Bool para ferificar se o cursor se encontra dentro de uma string ou não
-    int inString = 0;
+    int inString = 0; // Bool para verificar se o cursor está dentro de uma string
 
     // Loop até o fim do arquivo de referência
     while (cur != EOF)
     {
-        // Caminha os últimos 9 caracteres e verifica se são ".asciiz \""
-        caminhar(last9, cur);
-        if (!strcmp(last9, ".asciiz \"")) inString = 1;
+        // Se achar aspas duplas, inverte a flag
+        if (cur == '"') {
+            inString = !inString;
+        }
         
-        // Somente discrimina espaços e tabs se não estiver dentro de string
+        // Somente discrimina espaços se não estiver dentro de string
         if (!inString)
         {
             if (prev != ' ' && prev != '\n' || cur != ' ') // A'C'+B' MAPA DE KARNAUGH PRA QUEM LEMBRA KAKAKAKA
@@ -149,10 +135,7 @@ void RemoverTabEspacos(char * fn)
         else { putc(cur, buf); }
         
         prev = cur;
-        cur = getc(ref); i++;
-
-        // No caso de estar dentro de uma string, verifica se o próximo caractere é um '"', fechando saindo assim de dentro da string
-        if (inString) { inString = (cur == '"')? 0 : 1; }
+        cur = getc(ref);
     }
 
     FecharESubstituir(ref, buf);
