@@ -118,6 +118,11 @@ void RemoverTabEspacos(char * fn)
     // Loop até o fim do arquivo de referência
     while (cur != EOF)
     {
+        // se for um tab fora da string, transforma ele num espaço normal
+        if (cur == '\t' && inString == 0) {
+            cur = ' ';
+        }
+
         // Se achar aspas duplas, inverte a flag
         if (cur == '"') {
             inString = !inString;
