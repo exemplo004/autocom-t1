@@ -20,11 +20,12 @@ int main (int argc, char ** argv)
     if (arquivo == NULL)
     {
         printf("O arquivo %s nao foi encontrado.\n", in);
+        fclose(arquivo);
         return 1;
     }
-    fclose(arquivo);
 
     Preprocessar(in, out);
 
+    fclose(arquivo);
     return 0;
 }
