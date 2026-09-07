@@ -10,8 +10,6 @@ void FecharESubstituir(FILE * old, FILE * new)
     rename(ARQUIVO_TEMPORARIO, ARQUIVO_REFERENCIA);
 }
 
-
-
 // Troca os '\r' do Windows por '\n'
 void normalizarQuebraDeLinha(char * fn)
 {
@@ -44,32 +42,35 @@ void RemoverComentarios(char * fn)
     FILE * ref = fopen(fn, "r");
     FILE * buf = fopen(ARQUIVO_TEMPORARIO, "w");
 
-    if (ref == NULL || buf == NULL) return;
+    if (ref == NULL || buf == NULL) {
+        perror("Erro ao abrir arquivo");
+        return;
+    }
 
     int cur = getc(ref);
-    int dentro_de_string = 0;
-    int dentro_de_comentario = 0;
+    int inString = 0;
+    int inComentario = 0;
 
     while (cur != EOF)
     {
-        // liga ou desliga flag se achar aspas duplas
-        if (cur == '"' && dentro_de_comentario == 0) {
-            dentro_de_string = !dentro_de_string;
+        // Liga ou desliga flag se achar aspas duplas
+        if (cur == '"' && inComentario == 0) {
+            inString = !inString; // kikikiki isso eu achei massa! ~kristhian
         }
 
-        // se for # e não tiver na string, começou um comentario
-        if (cur == '#' && dentro_de_string == 0) {
-            dentro_de_comentario = 1;
+        // Se for '#' e não tiver na string, começou um comentário
+        if (cur == '#' && inString == 0) {
+            inComentario = 1;
         }
 
-        if (dentro_de_comentario == 1) {
-            // se a linha acabar, reseta o comentario
+        if (inComentario == 1) {
+            // Se a linha acabar, reseta o comentário
             if (cur == '\n') {
-                dentro_de_comentario = 0;
-                putc(cur, buf); // salva o enter pra não ficar tudo em uma linha só
+                inComentario = 0;
+                putc(cur, buf); // Escreve o enter pra não ficar tudo em uma linha só
             }
         } else {
-            // salva a letra normal
+            // Escreve a letra normal
             putc(cur, buf);
         }
 
@@ -111,6 +112,11 @@ void RemoverTabEspacos(char * fn)
     FILE * ref = fopen(fn, "r");
     FILE * buf = fopen("buffer", "w");
 
+    if (ref == NULL || buf == NULL) {
+        perror("Erro ao abrir arquivo");
+        return;
+    }
+
     char prev = '\n';
     char cur = getc(ref);
     int inString = 0; // Bool para verificar se o cursor está dentro de uma string
@@ -118,7 +124,7 @@ void RemoverTabEspacos(char * fn)
     // Loop até o fim do arquivo de referência
     while (cur != EOF)
     {
-        // se for um tab fora da string, transforma ele num espaço normal
+        // Se for um tab fora da string, transforma ele num espaço normal
         if (cur == '\t' && inString == 0) {
             cur = ' ';
         }
@@ -137,7 +143,7 @@ void RemoverTabEspacos(char * fn)
             }
         }
         // Como está em uma string, sobrescreve sem discriminação
-        else { putc(cur, buf); }
+        else putc(cur, buf);
         
         prev = cur;
         cur = getc(ref);
@@ -146,17 +152,17 @@ void RemoverTabEspacos(char * fn)
     FecharESubstituir(ref, buf);
 }
 
-void Preprocessar(char * inp, char * saida)
+void Preprocessar(char * entrada, char * saida)
 {
     char cmd[256];
-    sprintf(cmd, "copy %s ref", inp); // Alterado para 'copy' pra funcionar no Windows
+    sprintf(cmd, "copy %s ref", entrada); // Alterado para 'copy' pra funcionar no Windows
     system(cmd);
     normalizarQuebraDeLinha(ARQUIVO_REFERENCIA);
     RemoverComentarios(ARQUIVO_REFERENCIA);
     RemoverLinhasVazias(ARQUIVO_REFERENCIA);
     RemoverTabEspacos(ARQUIVO_REFERENCIA);
 
-    // copia o arquivo temporário 'ref' para o nome final que o usuário pediu
+    // Copia o arquivo temporário 'ref' para o nome final que o usuário pediu
     sprintf(cmd, "copy ref %s", saida);
     system(cmd);
     remove("ref");
