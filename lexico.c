@@ -26,21 +26,19 @@ static const PalavraReservada TABELA_DIRETIVAS[] = {
 
 static const PalavraReservada TABELA_INSTRUCOES[] = {
     {"li", "INS_LI"}, {"la", "INS_LA"}, {"move", "INS_MOVE"},
-    {"lw", "INS_LW"}, {"sw", "INS_SW"}, {"lb", "INS_LB"}, {"sb", "INS_SB"},
-    {"lh", "INS_LH"}, {"sh", "INS_SH"},
-
+    {"lw", "INS_LW"}, {"sw", "INS_SW"}, {"lb", "INS_LB"},
+    {"sb", "INS_SB"}, {"lh", "INS_LH"}, {"sh", "INS_SH"},
     {"add", "INS_ADD"}, {"addi", "INS_ADDI"}, {"addu", "INS_ADDU"},
     {"sub", "INS_SUB"}, {"subu", "INS_SUBU"}, {"mul", "INS_MUL"},
     {"div", "INS_DIV"}, {"mflo", "INS_MFLO"}, {"mfhi", "INS_MFHI"},
-
-    {"and", "INS_AND"}, {"or", "INS_OR"}, {"xor", "INS_XOR"}, {"nor", "INS_NOR"},
-    {"sll", "INS_SLL"}, {"srl", "INS_SRL"}, {"slt", "INS_SLT"},
-
-    {"beq", "INS_BEQ"}, {"bne", "INS_BNE"}, {"blt", "INS_BLT"}, {"ble", "INS_BLE"},
-    {"bgt", "INS_BGT"}, {"bge", "INS_BGE"}, {"j", "INS_J"}, {"jal", "INS_JAL"},
+    {"and", "INS_AND"}, {"or", "INS_OR"}, {"xor", "INS_XOR"},
+    {"nor", "INS_NOR"}, {"sll", "INS_SLL"}, {"srl", "INS_SRL"},
+    {"slt", "INS_SLT"}, {"beq", "INS_BEQ"}, {"bne", "INS_BNE"},
+    {"blt", "INS_BLT"}, {"ble", "INS_BLE"}, {"bgt", "INS_BGT"},
+    {"bge", "INS_BGE"}, {"j", "INS_J"}, {"jal", "INS_JAL"},
     {"jr", "INS_JR"}, {"syscall", "INS_SYSCALL"}, {"nop", "INS_NOP"}
 };
-#define QTD_INSTRUCOES (int)(sizeof(TABELA_INSTRUCOES) / sizeof(TABELA_INSTRUCOES[0]))
+#define QTD_INSTRUCOES 36 // Mesma coisa das diretivas
 
 static const char * TABELA_NOMES_REGISTRADORES[] = {
     "zero",
@@ -51,7 +49,7 @@ static const char * TABELA_NOMES_REGISTRADORES[] = {
     "k0", "k1",
     "gp", "sp", "fp", "ra"
 };
-#define QTD_NOMES_REGISTRADORES (int)(sizeof(TABELA_NOMES_REGISTRADORES) / sizeof(TABELA_NOMES_REGISTRADORES[0]))
+#define QTD_NOMES_REGISTRADORES 31
 
 static void ParaMinusculo(const char * origem, char * destino)
 {
@@ -62,7 +60,6 @@ static void ParaMinusculo(const char * origem, char * destino)
     destino[i] = '\0';
 }
 
-// Busca linear simples
 static const char * BuscarDiretiva(const char * lexemaMinusculo)
 {
     for (int i = 0; i < QTD_DIRETIVAS; i++) {
@@ -633,10 +630,6 @@ static void GravarErros(void)
 
 void AnaliseLexica(FILE * in, FILE * out)
 {
-    // Reinicia todo estado global do módulo a cada chamada, pra ser seguro
-    g_linha = 1;
-    g_coluna = 1;
-    totalErros = 0;
     InicializarTabelaSimbolos();
 
     Token t;
