@@ -4,6 +4,6 @@
 #define ARQUIVO_REFERENCIA "ref"
 #define ARQUIVO_TEMPORARIO "buffer"
 
-void Preprocessar(char * entrada, char * saida);
+void PreProcessamento(char * entrada, char * saida);
 
 #endif

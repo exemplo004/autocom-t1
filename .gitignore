@@ -57,6 +57,11 @@ dkms.conf
 # ---- Adicionado depois
 *.txt
 .vscode/
+*.err
+*.ts
+outlex
+outpre
+teste_0*
 
 # Evita arquivo de referência e script que eu estou usando ~kristhian
 ref

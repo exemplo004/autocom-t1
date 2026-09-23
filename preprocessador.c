@@ -11,7 +11,7 @@ void FecharESubstituir(FILE * old, FILE * new)
 }
 
 // Troca os '\r' do Windows por '\n'
-void normalizarQuebraDeLinha(char * fn)
+void NormalizarQuebraDeLinha(char * fn)
 {
     FILE * ref = fopen(fn, "r");
     FILE * buf = fopen(ARQUIVO_TEMPORARIO, "w");
@@ -152,18 +152,18 @@ void RemoverTabEspacos(char * fn)
     FecharESubstituir(ref, buf);
 }
 
-void Preprocessar(char * entrada, char * saida)
+void PreProcessamento(char * entrada, char * saida)
 {
     char cmd[256];
-    sprintf(cmd, "copy %s ref", entrada); // Alterado para 'copy' pra funcionar no Windows
+    sprintf(cmd, "cp %s ref", entrada); // 'cp' para Linux, 'copy' para Windows
     system(cmd);
-    normalizarQuebraDeLinha(ARQUIVO_REFERENCIA);
+    NormalizarQuebraDeLinha(ARQUIVO_REFERENCIA);
     RemoverComentarios(ARQUIVO_REFERENCIA);
     RemoverLinhasVazias(ARQUIVO_REFERENCIA);
     RemoverTabEspacos(ARQUIVO_REFERENCIA);
 
     // Copia o arquivo temporário 'ref' para o nome final que o usuário pediu
-    sprintf(cmd, "copy ref %s", saida);
+    sprintf(cmd, "cp ref %s", saida); // 'cp' para Linux, 'copy' para Windows
     system(cmd);
     remove("ref");
 }
